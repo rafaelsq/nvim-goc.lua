@@ -136,7 +136,12 @@ M.CoverageFunc = function(p, html)
     end
   end
   if p:type() ~= "function_declaration" then
-    return M.CoverageFunc(p:parent(), html)
+    p = p:parent()
+    if not p then
+      print("no test function found")
+      return
+    end
+    return M.CoverageFunc(p, html)
   end
   return M.Coverage(string.gmatch(ts_utils.get_node_text(p)[1], 'Test[^%s%(]+')(), html)
 end

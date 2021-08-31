@@ -22,9 +22,9 @@ _G.cf = function(testCurrentFunction)
   end
 
   if testCurrentFunction then
-    path = goc.CoverageFunc(nil, cb)
+    goc.CoverageFunc(nil, cb, 0)
   else
-    path = goc.Coverage(nil, cb)
+    goc.Coverage(nil, cb)
   end
 end
 
