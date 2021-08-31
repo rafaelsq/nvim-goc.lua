@@ -27,8 +27,7 @@ M.setup = function(opts)
   vim.highlight.link('GocUncovered', 'Error')
 end
 
-M.Coverage = function(fn)
-  print('...')
+M.Coverage = function(fn, html)
   local fullPathFile = string.gsub(vim.api.nvim_buf_get_name(0), "_test", "")
   local bufnr = vim.uri_to_bufnr("file://." .. fullPathFile)
 
@@ -58,6 +57,13 @@ M.Coverage = function(fn)
     h:close()
 
     if code == 0 then
+      if html then
+        local tmphtml = vim.api.nvim_eval('tempname()') .. '.html'
+        vim.cmd(':silent exec "!go tool cover -html='.. tmp ..' -o '.. tmphtml ..'"')
+        html(tmphtml)
+        return
+      end
+
       if not vim.api.nvim_buf_is_loaded(bufnr) or #vim.fn.win_findbuf(bufnr) == 0 then
         vim.cmd("sp " .. string.gsub(fullPathFile, vim.fn.getcwd() .. '/', ''))
       end
@@ -121,15 +127,18 @@ M.Coverage = function(fn)
   vim.loop.read_start(stderr, writeToScratch)
 end
 
-M.CoverageFunc = function(p)
-  if p == nil then
-    p = ts_utils.get_node_at_cursor():parent()
+M.CoverageFunc = function(p, html)
+  if not p then
+    p = ts_utils.get_node_at_cursor()
+    if not p then
+      print("no test function found")
+      return
+    end
   end
   if p:type() ~= "function_declaration" then
-    M.CoverageFunc(p:parent())
-    return
+    return M.CoverageFunc(p:parent(), html)
   end
-  M.Coverage(string.gmatch(ts_utils.get_node_text(p)[1], 'Test[^%s%(]+')())
+  return M.Coverage(string.gmatch(ts_utils.get_node_text(p)[1], 'Test[^%s%(]+')(), html)
 end
 
 M.ClearCoverage = function(bufnr)
