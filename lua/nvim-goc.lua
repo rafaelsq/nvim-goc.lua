@@ -28,6 +28,7 @@ M.setup = function(opts)
 end
 
 M.Coverage = function(fn)
+  print('...')
   local fullPathFile = string.gsub(vim.api.nvim_buf_get_name(0), "_test", "")
   local bufnr = vim.uri_to_bufnr("file://." .. fullPathFile)
 
@@ -58,7 +59,7 @@ M.Coverage = function(fn)
 
     if code == 0 then
       if not vim.api.nvim_buf_is_loaded(bufnr) or #vim.fn.win_findbuf(bufnr) == 0 then
-        vim.cmd("sp " .. fullPathFile)
+        vim.cmd("sp " .. string.gsub(fullPathFile, vim.fn.getcwd() .. '/', ''))
       end
 
       for i = 0,vim.fn.line('$') do
