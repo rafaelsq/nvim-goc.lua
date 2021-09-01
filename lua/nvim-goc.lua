@@ -28,6 +28,7 @@ M.setup = function(opts)
 end
 
 M.Coverage = function(fn, html)
+  print('[goc] ...')
   local fullPathFile = string.gsub(vim.api.nvim_buf_get_name(0), "_test", "")
   local bufnr = vim.uri_to_bufnr("file://." .. fullPathFile)
 
@@ -57,6 +58,7 @@ M.Coverage = function(fn, html)
     h:close()
 
     if code == 0 then
+      print('[goc] succeed')
       if html then
         local tmphtml = vim.api.nvim_eval('tempname()') .. '.html'
         vim.cmd(':silent exec "!go tool cover -html='.. tmp ..' -o '.. tmphtml ..'"')
@@ -76,11 +78,11 @@ M.Coverage = function(fn, html)
       for i = 2,#lines do
         local path = string.gmatch(lines[i], '(.+):')()
         if string.find(path, relativeFile) then
-          local marks = string.gmatch(lines[i], '%d+')
+          local marks = string.gmatch(string.gsub(lines[i], '[^:]+:', ''), '%d+')
 
-          local startline = tonumber(marks()) - 1
-          local startcol = tonumber(marks()) - 1
-          local endline = tonumber(marks()) -1
+          local startline = math.max(tonumber(marks()) - 1, 0)
+          local startcol = math.max(tonumber(marks()) - 1, 0)
+          local endline = math.max(tonumber(marks()) -1, 0)
           local endcol = tonumber(marks())
           local numstmt = tonumber(marks())
           local cnt = tonumber(marks())
