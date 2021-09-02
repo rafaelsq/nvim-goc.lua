@@ -58,7 +58,7 @@ M.Coverage = function(fn, html)
     h:close()
 
     if code == 0 then
-      print('[goc] succeed')
+      print('[goc] coverage', string.gmatch(table.concat(vim.api.nvim_buf_get_lines(M.errBuf, 0, -1, true)), 'coverage: (%d+)')() .. '%')
       if html then
         local tmphtml = vim.api.nvim_eval('tempname()') .. '.html'
         vim.cmd(':silent exec "!go tool cover -html='.. tmp ..' -o '.. tmphtml ..'"')
