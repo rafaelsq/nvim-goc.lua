@@ -33,4 +33,9 @@ end
 -- vim.highlight.link('GocNormal', 'Comment')
 -- vim.highlight.link('GocCovered', 'String')
 -- vim.highlight.link('GocUncovered', 'Error')
+
+-- alternate between test file and normal file
+vim.cmd('autocmd FileType go nnoremap <silent> ]a :lua require("nvim-goc").Alternate()<CR>')
+vim.cmd('autocmd FileType go nnoremap <silent> [a :lua require("nvim-goc").Alternate(true)<CR>')
+
 ```

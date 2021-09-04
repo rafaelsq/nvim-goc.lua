@@ -152,4 +152,22 @@ M.ClearCoverage = function(bufnr)
   vim.api.nvim_buf_clear_namespace(bufnr, M.hi, 0, -1)
 end
 
+M.Alternate = function(split)
+  local path, file, ext = string.match(vim.api.nvim_buf_get_name(0), "(.+/)([^.]+)%.(.+)$")
+  if ext == "go" then
+    local aux = '_test.'
+    if string.find(file, '_test') then
+      aux = '.'
+      path, file, ext = string.match(vim.api.nvim_buf_get_name(0), "(.+/)([^.]+)_test%.(.+)$")
+    end
+
+    local cmd = split and ':sp ' or ':e '
+    vim.cmd(cmd .. path .. file .. aux .. ext)
+  end
+end
+
+----------- alternate
+vim.cmd('autocmd FileType go nnoremap <silent> ]a :lua alternateGo(0)<CR>')
+vim.cmd('autocmd FileType go nnoremap <silent> [a :lua alternateGo(1)<CR>')
+
 return M
