@@ -30,7 +30,7 @@ end
 M.Coverage = function(fn, html)
   print('[goc] ...')
   local fullPathFile = string.gsub(vim.api.nvim_buf_get_name(0), "_test", "")
-  local bufnr = vim.uri_to_bufnr("file://." .. fullPathFile)
+  local bufnr = vim.uri_to_bufnr("file://" .. fullPathFile)
 
   local relativeFile = string.gsub(vim.fn.expand('%'), "_test", "")
   local package = vim.fn.expand('%:p:h')
