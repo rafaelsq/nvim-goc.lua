@@ -3,6 +3,7 @@ local ts_utils = require "nvim-treesitter.ts_utils"
 local M = {
   hi = vim.api.nvim_create_namespace("goc"),
   errBuf = nil,
+  splitCmd = 'sp ',
 }
 
 M.Show = function()
@@ -25,6 +26,12 @@ M.setup = function(opts)
   vim.highlight.link('GocNormal', 'Comment')
   vim.highlight.link('GocCovered', 'String')
   vim.highlight.link('GocUncovered', 'Error')
+
+  if opts then
+      verticalSplit = opts.verticalSplit or false
+      assert(type(verticalSplit) == "boolean", "verticalSplit must be boolean or nil")
+      M.splitCmd = verticalSplit and 'vsp ' or 'sp '
+  end
 end
 
 M.Coverage = function(fn, html)
@@ -67,7 +74,7 @@ M.Coverage = function(fn, html)
       end
 
       if not vim.api.nvim_buf_is_loaded(bufnr) or #vim.fn.win_findbuf(bufnr) == 0 then
-        vim.cmd("sp " .. string.gsub(fullPathFile, vim.fn.getcwd() .. '/', ''))
+        vim.cmd(M.splitCmd .. string.gsub(fullPathFile, vim.fn.getcwd() .. '/', ''))
       end
 
       for i = 0,vim.fn.line('$') do
@@ -161,7 +168,7 @@ M.Alternate = function(split)
       path, file, ext = string.match(vim.api.nvim_buf_get_name(0), "(.+/)([^.]+)_test%.(.+)$")
     end
 
-    local cmd = split and ':sp ' or ':e '
+    local cmd = split and M.splitCmd or 'e '
     vim.cmd(cmd .. path .. file .. aux .. ext)
   end
 end

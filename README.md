@@ -7,7 +7,14 @@ easy go coverage
 
 ```lua
 local goc = require'nvim-goc'
-goc.setup()
+goc.setup(opts)
+
+--[[
+  opts = {
+    verticalSplit = false
+  }
+]]
+
 
 vim.api.nvim_set_keymap('n', '<Leader>gcr', ':lua require("nvim-goc").Coverage()<CR>', {silent=true})
 vim.api.nvim_set_keymap('n', '<Leader>gcc', ':lua require("nvim-goc").ClearCoverage()<CR>', {silent=true})
@@ -36,6 +43,7 @@ end
 
 -- alternate between test file and normal file
 vim.cmd('autocmd FileType go nnoremap <silent> ]a :lua require("nvim-goc").Alternate()<CR>')
-vim.cmd('autocmd FileType go nnoremap <silent> [a :lua require("nvim-goc").Alternate(true)<CR>')
 
+-- alternate in a new split
+vim.cmd('autocmd FileType go nnoremap <silent> [a :lua require("nvim-goc").Alternate(true)<CR>')
 ```
