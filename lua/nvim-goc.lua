@@ -65,7 +65,15 @@ M.Coverage = function(fn, html)
     h:close()
 
     if code == 0 then
-      print('[goc] coverage', string.gmatch(table.concat(vim.api.nvim_buf_get_lines(M.errBuf, 0, -1, true)), 'coverage: (%d+)')() .. '%')
+      local percent = string.gmatch(table.concat(vim.api.nvim_buf_get_lines(M.errBuf, 0, -1, true)), 'coverage: (%d+)')()
+      if percent ~= nil then
+        print('[goc] coverage', percent .. '%')
+      else
+        print("[goc] check output!")
+        if #vim.fn.win_findbuf(M.errBuf) == 0 then
+          vim.cmd("vert sb " .. M.errBuf)
+        end
+      end
       if html then
         local tmphtml = vim.api.nvim_eval('tempname()') .. '.html'
         vim.cmd(':silent exec "!go tool cover -html='.. tmp ..' -o '.. tmphtml ..'"')
@@ -114,6 +122,7 @@ M.Coverage = function(fn, html)
         end
       end
     else
+      print("[goc] fail!")
       if #vim.fn.win_findbuf(M.errBuf) == 0 then
         vim.cmd("vert sb " .. M.errBuf)
       end
@@ -140,14 +149,14 @@ M.CoverageFunc = function(p, html)
   if not p then
     p = ts_utils.get_node_at_cursor()
     if not p then
-      print("no test function found")
+      print("[goc] no test function found")
       return
     end
   end
   if p:type() ~= "function_declaration" then
     p = p:parent()
     if not p then
-      print("no test function found")
+      print("[goc] no test function found")
       return
     end
     return M.CoverageFunc(p, html)
