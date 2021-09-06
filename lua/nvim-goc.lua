@@ -4,6 +4,7 @@ local M = {
   hi = vim.api.nvim_create_namespace("goc"),
   errBuf = nil,
   splitCmd = 'sp ',
+  useopen = vim.tbl_contains(vim.opt.switchbuf:get(), 'useopen'),
 }
 
 M.Show = function()
@@ -83,6 +84,8 @@ M.Coverage = function(fn, html)
 
       if not vim.api.nvim_buf_is_loaded(bufnr) or #vim.fn.win_findbuf(bufnr) == 0 then
         vim.cmd(M.splitCmd .. string.gsub(fullPathFile, vim.fn.getcwd() .. '/', ''))
+      elseif M.useopen then
+        vim.cmd(":sb " .. string.gsub(fullPathFile, vim.fn.getcwd() .. '/', ''))
       end
 
       for i = 0,vim.fn.line('$') do
@@ -177,13 +180,14 @@ M.Alternate = function(split)
       path, file, ext = string.match(vim.api.nvim_buf_get_name(0), "(.+/)([^.]+)_test%.(.+)$")
     end
 
-    local cmd = split and M.splitCmd or 'e '
-    vim.cmd(cmd .. path .. file .. aux .. ext)
+    local bufnr = vim.uri_to_bufnr("file://" .. path .. file .. aux .. ext)
+    if not vim.api.nvim_buf_is_loaded(bufnr) or #vim.fn.win_findbuf(bufnr) == 0 then
+      local cmd = split and M.splitCmd or 'e '
+      vim.cmd(cmd .. path .. file .. aux .. ext)
+    elseif M.useopen then
+      vim.cmd(":sb " .. path .. file .. aux .. ext)
+    end
   end
 end
-
------------ alternate
-vim.cmd('autocmd FileType go nnoremap <silent> ]a :lua alternateGo(0)<CR>')
-vim.cmd('autocmd FileType go nnoremap <silent> [a :lua alternateGo(1)<CR>')
 
 return M

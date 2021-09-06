@@ -6,14 +6,12 @@ easy go coverage
 ## Setup
 
 ```lua
-local goc = require'nvim-goc'
-goc.setup(opts)
 
---[[
-  opts = {
-    verticalSplit = false
-  }
-]]
+-- usefull to switch to buffer if it is already open
+vim.opt.switchbuf = 'useopen'
+
+local goc = require'nvim-goc'
+goc.setup({ verticalSplit = false })
 
 
 vim.api.nvim_set_keymap('n', '<Leader>gcr', ':lua require("nvim-goc").Coverage()<CR>', {silent=true})
@@ -42,8 +40,8 @@ end
 -- vim.highlight.link('GocUncovered', 'Error')
 
 -- alternate between test file and normal file
-vim.cmd('autocmd FileType go nnoremap <silent> ]a :lua require("nvim-goc").Alternate()<CR>')
+vim.api.nvim_set_keymap('n', ']a', ':lua require("nvim-goc").Alternate()<CR>', {silent=true})
 
 -- alternate in a new split
-vim.cmd('autocmd FileType go nnoremap <silent> [a :lua require("nvim-goc").Alternate(true)<CR>')
+vim.api.nvim_set_keymap('n', '[a', ':lua require("nvim-goc").Alternate(true)<CR>', {silent=true})
 ```
