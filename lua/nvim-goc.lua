@@ -37,6 +37,9 @@ end
 
 M.Coverage = function(fn, html)
   print('[goc] ...')
+  if M.errBuf ~= nil then
+    vim.api.nvim_buf_set_lines(M.errBuf, 0, -1, false, {"..."})
+  end
   local fullPathFile = string.gsub(vim.api.nvim_buf_get_name(0), "_test", "")
   local bufnr = vim.uri_to_bufnr("file://" .. fullPathFile)
 
@@ -51,10 +54,9 @@ M.Coverage = function(fn, html)
     args = {'test', '-coverprofile', tmp, "-run", fn, package}
   end
 
-  if M.errBuf ~= nil then
-    vim.api.nvim_buf_delete(M.errBuf, {force=true})
+  if M.errBuf == nil then
+    M.errBuf = vim.api.nvim_create_buf(true, true)
   end
-  M.errBuf = vim.api.nvim_create_buf(true, true)
 
   local stdout = vim.loop.new_pipe(false)
   local stderr = vim.loop.new_pipe(false)
@@ -69,6 +71,10 @@ M.Coverage = function(fn, html)
       local percent = string.gmatch(table.concat(vim.api.nvim_buf_get_lines(M.errBuf, 0, -1, true)), 'coverage: (%d+)')()
       if percent ~= nil then
         print('[goc] coverage', percent .. '%')
+        if #vim.fn.win_findbuf(M.errBuf) > 0 then
+          vim.api.nvim_buf_delete(M.errBuf, {force=true})
+          M.errBuf = nil
+        end
       else
         print("[goc] check output!")
         if #vim.fn.win_findbuf(M.errBuf) == 0 then

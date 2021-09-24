@@ -7,7 +7,7 @@ easy go coverage
 
 ```lua
 
--- usefull to switch to buffer if it is already open
+-- if set, when we switch between buffers, it will not split more than once. It will switch to the existing buffer instead
 vim.opt.switchbuf = 'useopen'
 
 local goc = require'nvim-goc'
