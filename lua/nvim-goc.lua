@@ -4,6 +4,7 @@ local M = {
   hi = vim.api.nvim_create_namespace("goc"),
   errBuf = nil,
   splitCmd = 'sp ',
+  splitSBCmd = 'to ',
   useopen = vim.tbl_contains(vim.opt.switchbuf:get(), 'useopen'),
 }
 
@@ -32,6 +33,7 @@ M.setup = function(opts)
       verticalSplit = opts.verticalSplit or false
       assert(type(verticalSplit) == "boolean", "verticalSplit must be boolean or nil")
       M.splitCmd = verticalSplit and 'vsp ' or 'sp '
+      M.splitSBCmd = verticalSplit and 'vert ' or 'to '
   end
 end
 
@@ -133,7 +135,7 @@ M.Coverage = function(fn, html)
     else
       print("[goc] fail!")
       if #vim.fn.win_findbuf(M.errBuf) == 0 then
-        vim.cmd("vert sb " .. M.errBuf)
+        vim.cmd(M.splitSBCmd .. " sb " .. M.errBuf)
       end
     end
   end))
@@ -191,7 +193,7 @@ M.Alternate = function(split)
       local cmd = split and M.splitCmd or 'e '
       vim.cmd(cmd .. path .. file .. aux .. ext)
     elseif M.useopen then
-      vim.cmd(":sb " .. path .. file .. aux .. ext)
+      vim.cmd(":" .. M.splitSBCmd .. "sb " .. path .. file .. aux .. ext)
     end
   end
 end
