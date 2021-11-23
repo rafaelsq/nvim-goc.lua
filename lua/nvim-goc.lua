@@ -5,7 +5,6 @@ local M = {
   errBuf = nil,
   splitCmd = 'sp ',
   splitSBCmd = 'to ',
-  useopen = vim.tbl_contains(vim.opt.switchbuf:get(), 'useopen'),
 }
 
 M.Show = function()
@@ -92,7 +91,7 @@ M.Coverage = function(fn, html)
 
       if not vim.api.nvim_buf_is_loaded(bufnr) or #vim.fn.win_findbuf(bufnr) == 0 then
         vim.cmd(M.splitCmd .. string.gsub(fullPathFile, vim.fn.getcwd() .. '/', ''))
-      elseif M.useopen then
+      elseif vim.tbl_contains(vim.opt.switchbuf:get(), 'useopen') then
         vim.cmd(":sb " .. string.gsub(fullPathFile, vim.fn.getcwd() .. '/', ''))
       end
 
@@ -192,7 +191,7 @@ M.Alternate = function(split)
     if not vim.api.nvim_buf_is_loaded(bufnr) or #vim.fn.win_findbuf(bufnr) == 0 then
       local cmd = split and M.splitCmd or 'e '
       vim.cmd(cmd .. path .. file .. aux .. ext)
-    elseif M.useopen then
+    elseif vim.tbl_contains(vim.opt.switchbuf:get(), 'useopen') then
       vim.cmd(":" .. M.splitSBCmd .. "sb " .. path .. file .. aux .. ext)
     end
   end
