@@ -175,6 +175,9 @@ M.CoverageFunc = function(p, html)
 end
 
 M.ClearCoverage = function(bufnr)
+  if not bufnr then
+    bufnr = 0
+  end
   vim.api.nvim_buf_clear_namespace(bufnr, M.hi, 0, -1)
 end
 
