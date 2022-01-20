@@ -175,7 +175,11 @@ M.CoverageFunc = function(p, html)
 end
 
 M.ClearCoverage = function(bufnr)
-  vim.api.nvim_buf_clear_namespace(bufnr, M.hi, 0, -1)
+  vim.api.nvim_buf_clear_namespace(bufnr or 0, M.hi, 0, -1)
+end
+
+M.AlternateSplit = function(split)
+  M.Alternate(true)
 end
 
 M.Alternate = function(split)

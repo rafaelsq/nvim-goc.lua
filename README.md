@@ -14,13 +14,13 @@ local goc = require'nvim-goc'
 goc.setup({ verticalSplit = false })
 
 
-vim.api.nvim_set_keymap('n', '<Leader>gcr', ':lua require("nvim-goc").Coverage()<CR>', {silent=true})
-vim.api.nvim_set_keymap('n', '<Leader>gcc', ':lua require("nvim-goc").ClearCoverage()<CR>', {silent=true})
-vim.api.nvim_set_keymap('n', '<Leader>gct', ':lua require("nvim-goc").CoverageFunc()<CR>', {silent=true})
-vim.api.nvim_set_keymap('n', '<Leader>gca', ':lua cf(false)<CR><CR>', {silent=true})
-vim.api.nvim_set_keymap('n', '<Leader>gcb', ':lua cf(true)<CR><CR>', {silent=true})
+vim.keymap.set('n', '<Leader>gcr', goc.Coverage, {silent=true})
+vim.keymap.set('n', '<Leader>gcc', goc.ClearCoverage, {silent=true})
+vim.keymap.set('n', '<Leader>gct', goc.CoverageFunc, {silent=true})
+vim.keymap.set('n', ']a', goc.Alternate, {silent=true})
+vim.keymap.set('n', '[a', goc.AlternateSplit, {silent=true})
 
-_G.cf = function(testCurrentFunction)
+cf = function(testCurrentFunction)
   local cb = function(path)
     if path then
       vim.cmd(":silent exec \"!xdg-open " .. path .. "\"")
@@ -34,14 +34,11 @@ _G.cf = function(testCurrentFunction)
   end
 end
 
+vim.keymap.set('n', '<leader>gca', cf, {silent=true})
+vim.keymap.set('n', '<Leader>gcb', function() cf(true) end, {silent=true})
+
 -- default colors
 -- vim.highlight.link('GocNormal', 'Comment')
 -- vim.highlight.link('GocCovered', 'String')
 -- vim.highlight.link('GocUncovered', 'Error')
-
--- alternate between test file and normal file
-vim.api.nvim_set_keymap('n', ']a', ':lua require("nvim-goc").Alternate()<CR>', {silent=true})
-
--- alternate in a new split
-vim.api.nvim_set_keymap('n', '[a', ':lua require("nvim-goc").Alternate(true)<CR>', {silent=true})
 ```
