@@ -44,7 +44,9 @@ M.Coverage = function(fn, html)
   local fullPathFile = string.gsub(vim.api.nvim_buf_get_name(0), "_test", "")
   local bufnr = vim.uri_to_bufnr("file://" .. fullPathFile)
 
-  local relativeFile = string.gsub(vim.fn.expand('%'), "_test", "")
+  -- use '%:.' to ensure the current path is relative (required for matching
+  -- coverage output)
+  local relativeFile = string.gsub(vim.fn.expand('%:.'), "_test", "")
   local package = vim.fn.expand('%:p:h')
   local tmp = vim.api.nvim_eval('tempname()')
 
