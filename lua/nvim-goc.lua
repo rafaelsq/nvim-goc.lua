@@ -191,7 +191,11 @@ M.Alternate = function(split)
       path, file, ext = string.match(vim.api.nvim_buf_get_name(0), "(.+/)([^.]+)_test%.(.+)$")
     end
 
-    local bufnr = vim.uri_to_bufnr("file://" .. path .. file .. aux .. ext)
+    -- relative
+    path = string.sub(string.gsub(path, vim.loop.cwd(), ''), 2)
+
+    local bufnr = vim.fn.bufadd(path .. file .. aux .. ext)
+
     if not vim.api.nvim_buf_is_loaded(bufnr) or #vim.fn.win_findbuf(bufnr) == 0 then
       local cmd = split and M.splitCmd or 'e '
       vim.cmd(cmd .. path .. file .. aux .. ext)
