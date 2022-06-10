@@ -44,7 +44,9 @@ M.Coverage = function(fn, html)
   local fullPathFile = string.gsub(vim.api.nvim_buf_get_name(0), "_test", "")
   local bufnr = vim.uri_to_bufnr("file://" .. fullPathFile)
 
-  local relativeFile = string.gsub(vim.fn.expand('%'), "_test", "")
+  -- use '%:.' to ensure the current path is relative (required for matching
+  -- coverage output)
+  local relativeFile = string.gsub(vim.fn.expand('%:.'), "_test", "")
   local package = vim.fn.expand('%:p:h')
   local tmp = vim.api.nvim_eval('tempname()')
 
@@ -102,7 +104,11 @@ M.Coverage = function(fn, html)
       local lines = vim.api.nvim_eval('readfile("' .. tmp .. '")')
       for i = 2,#lines do
         local path = string.gmatch(lines[i], '(.+):')()
-        if string.find(path, relativeFile) then
+	-- For every line in the coverage output, look for the current relative
+	-- 'path/to/foo.go' (and not /abs/path/to/foo.go or ./path/to/foo.go).
+	-- This must use 'vim.fn.expand("%:.")' when calculating relativeFile
+	-- for this to work.
+	if path:sub(-#relativeFile) == relativeFile then
           local marks = string.gmatch(string.gsub(lines[i], '[^:]+:', ''), '%d+')
 
           local startline = math.max(tonumber(marks()) - 1, 0)
