@@ -24,9 +24,10 @@ M.Show = function()
 end
 
 M.setup = function(opts)
-  vim.highlight.link('GocNormal', 'Comment')
-  vim.highlight.link('GocCovered', 'String')
-  vim.highlight.link('GocUncovered', 'Error')
+  -- setting highlight groups globally (0), linked to defaults
+  vim.api.nvim_set_hl(0, 'GocNormal', {link = 'Comment'})
+  vim.api.nvim_set_hl(0, 'GocCovered', {link = 'String'})
+  vim.api.nvim_set_hl(0, 'GocUncovered', {link = 'Error'})
 
   if opts then
       verticalSplit = opts.verticalSplit or false
