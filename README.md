@@ -38,7 +38,7 @@ vim.keymap.set('n', '<leader>gca', cf, {silent=true})
 vim.keymap.set('n', '<Leader>gcb', function() cf(true) end, {silent=true})
 
 -- default colors
--- vim.highlight.link('GocNormal', 'Comment')
--- vim.highlight.link('GocCovered', 'String')
--- vim.highlight.link('GocUncovered', 'Error')
+-- vim.api.nvim_set_hl(0, 'GocNormal', {link='Comment'})
+-- vim.api.nvim_set_hl(0, 'GocCovered', {link='String'})
+-- vim.api.nvim_set_hl(0, 'GocUncovered', {link='Error'})
 ```
