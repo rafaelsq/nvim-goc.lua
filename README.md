@@ -11,18 +11,26 @@ easy go coverage
 vim.opt.switchbuf = 'useopen'
 
 local goc = require'nvim-goc'
-goc.setup({ verticalSplit = false })
+goc.setup({ verticalSplit = false })  -- default to horizontal
 
 
-vim.keymap.set('n', '<Leader>gcr', goc.Coverage, {silent=true})
-vim.keymap.set('n', '<Leader>gcc', goc.ClearCoverage, {silent=true})
-vim.keymap.set('n', '<Leader>gct', goc.CoverageFunc, {silent=true})
+vim.keymap.set('n', '<Leader>gcf', goc.Coverage, {silent=true})       -- run for the whole File
+vim.keymap.set('n', '<Leader>gct', goc.CoverageFunc, {silent=true})   -- run only for a specific Test unit
+vim.keymap.set('n', '<Leader>gcc', goc.ClearCoverage, {silent=true})  -- clear coverage highlights
+
+-- If you need custom arguments, you can supply an array as in the example below.
+-- vim.keymap.set('n', '<Leader>gcf', function() goc.Coverage({ "-race", "-count=1" }) end, {silent=true})
+-- vim.keymap.set('n', '<Leader>gct', function() goc.CoverageFunc({ "-race", "-count=1" }) end, {silent=true})
+
 vim.keymap.set('n', ']a', goc.Alternate, {silent=true})
-vim.keymap.set('n', '[a', goc.AlternateSplit, {silent=true})
+vim.keymap.set('n', '[a', goc.AlternateSplit, {silent=true})          -- set verticalSplit=true for vertical
 
 cf = function(testCurrentFunction)
   local cb = function(path)
     if path then
+
+      -- `xdg-open|open` command performs the same function as double-clicking on the file.
+      -- change from `xdg-open` to `open` on MacOSx
       vim.cmd(":silent exec \"!xdg-open " .. path .. "\"")
     end
   end
@@ -34,6 +42,9 @@ cf = function(testCurrentFunction)
   end
 end
 
+-- If you want to open it in your browser, you can use the commands below.
+-- You need to create a callback function to configure which command to use to open the HTML.
+-- On Linux, `xdg-open` is generally used, on MacOSx it's just `open`.
 vim.keymap.set('n', '<leader>gca', cf, {silent=true})
 vim.keymap.set('n', '<Leader>gcb', function() cf(true) end, {silent=true})
 

@@ -7,22 +7,6 @@ local M = {
   splitSBCmd = 'to ',
 }
 
-M.Show = function()
-  local source = {}
-  for i, o in pairs(store) do
-    table.insert(source, i .. '\t' .. table.concat(o.regcontents, "\n"))
-  end
-
-  local w = vim.fn["fzf#wrap"]('Yanks', {
-    source = source,
-  })
-  w["sink*"] = function(line)
-    local o = store[tonumber(string.gmatch(line[2], '%d+')())]
-    vim.fn.setreg(vim.v.register, table.concat(o.regcontents, "\n"), o.regtype)
-  end
-  vim.fn["fzf#run"](w)
-end
-
 M.setup = function(opts)
   vim.api.nvim_set_hl(0, 'GocNormal', {link='Comment'})
   vim.api.nvim_set_hl(0, 'GocCovered', {link='String'})
@@ -36,7 +20,7 @@ M.setup = function(opts)
   end
 end
 
-M.Coverage = function(fn, html)
+Coverage = function(fn, html, customArgs)
   print('[goc] ...')
   if M.errBuf ~= nil then
     vim.api.nvim_buf_set_lines(M.errBuf, 0, -1, false, {"..."})
@@ -55,6 +39,12 @@ M.Coverage = function(fn, html)
   local args = {'test', '-coverprofile', tmp, package}
   if fn then
     args = {'test', '-coverprofile', tmp, "-run", fn, package}
+  end
+
+  if customArgs ~= nil then
+    for i=1, #customArgs do
+      table.insert(args, 1+i, customArgs[i])
+    end
   end
 
   if M.errBuf == nil then
@@ -161,7 +151,7 @@ M.Coverage = function(fn, html)
   vim.loop.read_start(stderr, writeToScratch)
 end
 
-M.CoverageFunc = function(p, html)
+CoverageFunc = function(p, html, customArgs)
   if not p then
     p = ts_utils.get_node_at_cursor()
     if not p then
@@ -175,16 +165,24 @@ M.CoverageFunc = function(p, html)
       print("[goc] no test function found")
       return
     end
-    return M.CoverageFunc(p, html)
+    return CoverageFunc(p, html, customArgs)
   end
-  return M.Coverage(string.gmatch(ts_utils.get_node_text(p)[1], 'Test[^%s%(]+')(), html)
+  return Coverage(string.gmatch(ts_utils.get_node_text(p)[1], 'Test[^%s%(]+')(), html, customArgs)
+end
+
+M.Coverage = function(customArgs)
+  Coverage(nil, nil, customArgs)
+end
+
+M.CoverageFunc = function(customArgs)
+  CoverageFunc(nil, nil, customArgs)
 end
 
 M.ClearCoverage = function(bufnr)
   vim.api.nvim_buf_clear_namespace(bufnr or 0, M.hi, 0, -1)
 end
 
-M.AlternateSplit = function(split)
+M.AlternateSplit = function()
   M.Alternate(true)
 end
 
