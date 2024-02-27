@@ -20,7 +20,7 @@ M.setup = function(opts)
   end
 end
 
-Coverage = function(fn, html, customArgs)
+M.Coverage = function(fn, html, customArgs)
   print('[goc] ...')
   if M.errBuf ~= nil then
     vim.api.nvim_buf_set_lines(M.errBuf, 0, -1, false, {"..."})
@@ -151,7 +151,7 @@ Coverage = function(fn, html, customArgs)
   vim.loop.read_start(stderr, writeToScratch)
 end
 
-CoverageFunc = function(p, html, customArgs)
+M.CoverageFunc = function(p, html, customArgs)
   if not p then
     p = ts_utils.get_node_at_cursor()
     if not p then
@@ -165,17 +165,9 @@ CoverageFunc = function(p, html, customArgs)
       print("[goc] no test function found")
       return
     end
-    return CoverageFunc(p, html, customArgs)
+    return M.CoverageFunc(p, html, customArgs)
   end
-  return Coverage(string.gmatch(ts_utils.get_node_text(p)[1], 'Test[^%s%(]+')(), html, customArgs)
-end
-
-M.Coverage = function(customArgs)
-  Coverage(nil, nil, customArgs)
-end
-
-M.CoverageFunc = function(customArgs)
-  CoverageFunc(nil, nil, customArgs)
+  return M.Coverage(string.gmatch(ts_utils.get_node_text(p)[1], 'Test[^%s%(]+')(), html, customArgs)
 end
 
 M.ClearCoverage = function(bufnr)
