@@ -165,9 +165,9 @@ M.CoverageFunc = function(p, html, customArgs)
       print("[goc] no test function found")
       return
     end
-    return CoverageFunc(p, html, customArgs)
+    return M.CoverageFunc(p, html, customArgs)
   end
-  return Coverage(string.gmatch(ts_utils.get_node_text(p)[1], 'Test[^%s%(]+')(), html, customArgs)
+  return M.Coverage(string.gmatch(ts_utils.get_node_text(p)[1], 'Test[^%s%(]+')(), html, customArgs)
 end
 
 M.ClearCoverage = function(bufnr)
