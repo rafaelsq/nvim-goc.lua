@@ -87,8 +87,15 @@ M.Coverage = function(fn, html, customArgs)
         vim.cmd(":sb " .. string.gsub(fullPathFile, vim.fn.getcwd() .. '/', ''))
       end
 
-      for i = 0,vim.fn.line('$') do
-        vim.api.nvim_buf_add_highlight(bufnr, M.hi, "GocNormal", i, 0, -1)
+      for i = 0, vim.fn.line("$") do
+        local buflines = vim.api.nvim_buf_get_lines(bufnr, i, i + 1, false)
+        local line = buflines[1] or ""
+        vim.api.nvim_buf_set_extmark(bufnr, M.hi, i, 0, {
+          end_row = i,
+          end_col = #line,
+          hl_group = "GocNormal",
+          priority = 130,
+        })
       end
 
       local lines = vim.api.nvim_eval('readfile("' .. tmp .. '")')
@@ -113,17 +120,25 @@ M.Coverage = function(fn, html, customArgs)
             hig = "GocCovered"
           end
 
-          for y = startline,endline do
+          for y = startline, endline do
             local sc = 0
-            local ec = -1
+            local opts = {
+              end_row = y,
+              priority = 131,
+              hl_group = hig,
+            }
             if startline == y then
               sc = startcol
             end
             if endline == y then
-              ec = endcol
+              opts.end_col = endcol - 1
+            else
+              local buflines = vim.api.nvim_buf_get_lines(bufnr, y, y + 1, false)
+              local line = buflines[1] or ""
+              opts.end_col = #line
             end
 
-            vim.api.nvim_buf_add_highlight(bufnr, M.hi, hig, y, sc, ec)
+            vim.api.nvim_buf_set_extmark(bufnr, M.hi, y, sc, opts)
           end
         end
       end
