@@ -75,9 +75,29 @@ M.Coverage = function(fn, html, customArgs)
         end
       end
       if html then
+        local lines = vim.api.nvim_eval('readfile("' .. tmp .. '")')
+        local file_i = -1
+        local last_file = ''
+        local final = ''
+        for i = 2,#lines do
+          local path = string.gmatch(lines[i], '(.+):')()
+          if last_file ~= path and final == '' then
+            last_file = path
+            file_i = file_i + 1
+          end
+
+          -- For every line in the coverage output, look for the current relative
+          -- 'path/to/foo.go' (and not /abs/path/to/foo.go or ./path/to/foo.go).
+          -- This must use 'vim.fn.expand("%:.")' when calculating relativeFile
+          -- for this to work.
+          if path:sub(-#relativeFile) == relativeFile then
+            final = last_file
+            break
+          end
+        end
         local tmphtml = vim.api.nvim_eval('tempname()') .. '.html'
         vim.cmd(':silent exec "!go tool cover -html='.. tmp ..' -o '.. tmphtml ..'"')
-        html(tmphtml)
+        html(tmphtml, file_i)
         return
       end
 
@@ -101,11 +121,13 @@ M.Coverage = function(fn, html, customArgs)
       local lines = vim.api.nvim_eval('readfile("' .. tmp .. '")')
       for i = 2,#lines do
         local path = string.gmatch(lines[i], '(.+):')()
-	-- For every line in the coverage output, look for the current relative
-	-- 'path/to/foo.go' (and not /abs/path/to/foo.go or ./path/to/foo.go).
-	-- This must use 'vim.fn.expand("%:.")' when calculating relativeFile
-	-- for this to work.
-	if path:sub(-#relativeFile) == relativeFile then
+
+        -- For every line in the coverage output, look for the current relative
+        -- 'path/to/foo.go' (and not /abs/path/to/foo.go or ./path/to/foo.go).
+        -- This must use 'vim.fn.expand("%:.")' when calculating relativeFile
+        -- for this to work.
+        if path:sub(-#relativeFile) == relativeFile then
+
           local marks = string.gmatch(string.gsub(lines[i], '[^:]+:', ''), '%d+')
 
           local startline = math.max(tonumber(marks()) - 1, 0)

@@ -26,12 +26,12 @@ vim.keymap.set('n', ']a', goc.Alternate, {silent=true})
 vim.keymap.set('n', '[a', goc.AlternateSplit, {silent=true})          -- set verticalSplit=true for vertical
 
 cf = function(testCurrentFunction)
-  local cb = function(path)
+  local cb = function(path, index)
     if path then
 
       -- `xdg-open|open` command performs the same function as double-clicking on the file.
       -- change from `xdg-open` to `open` on MacOSx
-      vim.cmd(":silent exec \"!xdg-open " .. path .. "\"")
+      vim.cmd(":silent exec \"!xdg-open file://" .. path .. "\\\\#file" .. index .. "\"")
     end
   end
 
