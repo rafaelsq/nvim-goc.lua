@@ -221,10 +221,10 @@ M.AlternateFile = function(split, suffix, sp)
     file = string.gsub(file, suffix, '')
   end
 
+  local bufnr = vim.fn.bufadd(path .. file .. aux .. ext)
   if split then
     vim.cmd(":" .. sp .. " sb " .. path .. file .. aux .. ext)
   else
-    local bufnr = vim.fn.bufadd(path .. file .. aux .. ext)
     local isVisible = #vim.fn.win_findbuf(bufnr) ~= 0
     if isVisible then
       vim.cmd(":sb " .. path .. file .. aux .. ext)
