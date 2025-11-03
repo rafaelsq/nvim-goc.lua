@@ -13,7 +13,7 @@ M.setup = function(opts)
   vim.api.nvim_set_hl(0, 'GocUncovered', {link='Error'})
 
   if opts then
-      verticalSplit = opts.verticalSplit or false
+      local verticalSplit = opts.verticalSplit or false
       assert(type(verticalSplit) == "boolean", "verticalSplit must be boolean or nil")
       M.splitCmd = verticalSplit and 'vsp ' or 'sp '
       M.splitSBCmd = verticalSplit and 'vert ' or 'to '
@@ -211,31 +211,35 @@ M.ClearCoverage = function(bufnr)
   vim.api.nvim_buf_clear_namespace(bufnr or 0, M.hi, 0, -1)
 end
 
+M.AlternateFile = function(split, suffix, sp)
+  local path = vim.fn.expand('%:h') .. '/' -- relative
+  local file = vim.fn.expand('%:t:r')
+  local ext = vim.fn.expand('%:e')
+  local aux = suffix .. '.'
+  if string.find(file, suffix) then
+    aux = '.'
+    file = string.gsub(file, suffix, '')
+  end
+
+  if split then
+    vim.cmd(":" .. sp .. " sb " .. path .. file .. aux .. ext)
+  else
+    local bufnr = vim.fn.bufadd(path .. file .. aux .. ext)
+    local isVisible = #vim.fn.win_findbuf(bufnr) ~= 0
+    if isVisible then
+      vim.cmd(":sb " .. path .. file .. aux .. ext)
+    else
+      vim.cmd('e ' .. path .. file .. aux .. ext)
+    end
+  end
+end
+
 M.AlternateSplit = function()
-  M.Alternate(true)
+  M.AlternateFile(true, "_test", M.splitSBCmd)
 end
 
 M.Alternate = function(split)
-  local path, file, ext = string.match(vim.api.nvim_buf_get_name(0), "(.+/)([^.]+)%.(.+)$")
-  if ext == "go" then
-    local aux = '_test.'
-    if string.find(file, '_test') then
-      aux = '.'
-      path, file, ext = string.match(vim.api.nvim_buf_get_name(0), "(.+/)([^.]+)_test%.(.+)$")
-    end
-
-    -- relative
-    path = string.sub(string.gsub(path, vim.loop.cwd(), ''), 2)
-
-    local bufnr = vim.fn.bufadd(path .. file .. aux .. ext)
-
-    if not vim.api.nvim_buf_is_loaded(bufnr) or #vim.fn.win_findbuf(bufnr) == 0 then
-      local cmd = split and M.splitCmd or 'e '
-      vim.cmd(cmd .. path .. file .. aux .. ext)
-    elseif vim.tbl_contains(vim.opt.switchbuf:get(), 'useopen') then
-      vim.cmd(":" .. M.splitSBCmd .. "sb " .. path .. file .. aux .. ext)
-    end
-  end
+  M.AlternateFile(split, "_test", M.splitSBCmd)
 end
 
 return M
