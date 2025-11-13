@@ -25,6 +25,14 @@ vim.keymap.set('n', '<Leader>gcc', goc.ClearCoverage, {silent=true})  -- clear c
 vim.keymap.set('n', ']a', goc.Alternate, {silent=true})
 vim.keymap.set('n', '[a', goc.AlternateSplit, {silent=true})          -- set verticalSplit=true for vertical
 
+-- If you prefer, you can also use AlternateFile to work with other languages:
+-- 1. create an augroup for the file type
+-- 2. goc.AlternateFile(split: bool, file_suffix: str, which_cmd_to_split: [vert|to])
+-- javascript example:
+vim.keymap.set('n', ']a', function() goc.AlternateFile(false, '.test', 'vert') end, { silent = true })
+vim.keymap.set('n', '[a', function() goc.AlternateFile(true, '.test', 'vert') end, { silent = true })
+
+-- If you want to open it in your browser, you can use the commands below.
 cf = function(testCurrentFunction)
   local cb = function(path, index)
     if path then
@@ -42,7 +50,6 @@ cf = function(testCurrentFunction)
   end
 end
 
--- If you want to open it in your browser, you can use the commands below.
 -- You need to create a callback function to configure which command to use to open the HTML.
 -- On Linux, `xdg-open` is generally used, on MacOSx it's just `open`.
 vim.keymap.set('n', '<leader>gca', cf, {silent=true})
