@@ -190,7 +190,7 @@ end
 
 M.CoverageFunc = function(p, html, customArgs)
   if not p then
-    p = ts.get_node_at_cursor()
+    p = ts.get_node()
     if not p then
       print("[goc] no test function found")
       return
